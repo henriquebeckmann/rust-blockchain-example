@@ -22,6 +22,8 @@ use tokio::{
 
 const DIFFICULTY_PREFIX: &str = "00";
 
+mod p2p;
+
 pub struct App {
     pub blocks: Vec<Block>,
 }
