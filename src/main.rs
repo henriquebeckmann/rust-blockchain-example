@@ -66,7 +66,7 @@ fn calculate_hash(id: u64, timestamp: i64, previous_hash: &str, data: &str, nonc
     hasher.finalize().as_slice().to_owned()
 }
 
-fn mine_block(id: u64, timestamp: i64, previous_hash: &str,data: &str) -> (u64, String) {
+fn mine_block(id: u64, timestamp: i64, previous_hash: &str, data: &str) -> (u64, String) {
     info!("mining block...");
     let mut nonce = 0;
 
@@ -78,11 +78,11 @@ fn mine_block(id: u64, timestamp: i64, previous_hash: &str,data: &str) -> (u64, 
         let binary_hash = hash_to_binary_representation(&hash);
         if binary_hash.starts_with(DIFFICULTY_PREFIX) {
             info!(
-                "Mined!, nonce: {}, hash: {}, binary hash: {}",
+                "mined! nonce: {}, hash: {}, binary hash: {}",
                 nonce,
                 hex::encode(&hash),
                 binary_hash
-                );
+            );
             return (nonce, hex::encode(hash));
         }
         nonce += 1;
@@ -94,7 +94,6 @@ fn hash_to_binary_representation(hash: &[u8]) -> String {
     for c in hash {
         res.push_str(&format!("{:b}", c));
     }
-
     res
 }
 
@@ -108,11 +107,10 @@ impl App {
             id: 0,
             timestamp: Utc::now().timestamp(),
             previous_hash: String::from("genesis"),
-            data: String::from("genesis"),
+            data: String::from("genesis!"),
             nonce: 2836,
             hash: "0000f816a87f806bb0073dcf026a64fb40c946b5abee2573702828694d5b4c43".to_string(),
         };
-
         self.blocks.push(genesis_block);
     }
 
@@ -131,30 +129,29 @@ impl App {
             return false;
         } else if !hash_to_binary_representation(
             &hex::decode(&block.hash).expect("can decode from hex"),
-            )
-            .starts_with(DIFFICULTY_PREFIX)
-            {
-                warn!("block with id: {} has invalid difficulty", block.id);
-                return false;
-            } else if block.id != previous_block.id + 1 {
-                warn!(
-                    "block with id: {} is not the next block after the latest: {}",
-                    block.id, previous_block.id
-                    );
-                return false;
-            } else if hex::encode(calculate_hash(
-                    block.id,
-                    block.timestamp,
-                    &block.previous_hash,
-                    &block.data,
-                    block.nonce,
-                    )) != block.hash
-            {
-                warn!("block with id: {} has invalid hash", block.id);
-                return false;
-            }
-
-            true
+        )
+        .starts_with(DIFFICULTY_PREFIX)
+        {
+            warn!("block with id: {} has invalid difficulty", block.id);
+            return false;
+        } else if block.id != previous_block.id + 1 {
+            warn!(
+                "block with id: {} is not the next block after the latest: {}",
+                block.id, previous_block.id
+            );
+            return false;
+        } else if hex::encode(calculate_hash(
+            block.id,
+            block.timestamp,
+            &block.previous_hash,
+            &block.data,
+            block.nonce,
+        )) != block.hash
+        {
+            warn!("block with id: {} has invalid hash", block.id);
+            return false;
+        }
+        true
     }
 
     fn is_chain_valid(&self, chain: &[Block]) -> bool {
@@ -168,7 +165,6 @@ impl App {
                 return false;
             }
         }
-
         true
     }
 
